@@ -10,7 +10,6 @@ class INRDataManipulation:
         self.data_final = None
 
         if path is not None:
-            # tenta carregar na inicialização (com checagens)
             self.read_data()
             self.fit_data()
         else:
@@ -20,7 +19,6 @@ class INRDataManipulation:
         if self.path is None:
             raise ValueError("Caminho do arquivo não definido. Use set_path() para definir o caminho.")
         if self.data_original is None:
-            # tenta ler automaticamente
             self.read_data()
         if require_final and self.data_final is None:
             self.fit_data()
@@ -80,10 +78,10 @@ class INRDataManipulation:
                 # escolher o exame mais próximo (se empate, o mais recente)
                 candidates = orig[close_mask].copy()
                 candidates['abs_diff'] = (candidates['test_date'] - d).abs()
-                candidates = candidates.sort_values(['abs_diff', 'test_date'], ascending=[True, False])
+                candidates = candidates.sort_values(['abs_diff', 'test_date'], ascending=[1, 0])
                 chosen = candidates.iloc[0].to_dict()
                 chosen['test_date'] = d
-                chosen['generated'] = False
+                chosen['generated'] = 0
                 rows.append(chosen)
                 continue
 
@@ -137,7 +135,7 @@ class INRDataManipulation:
                          'dose_semanal': dose_val,
                          'low_range': low_val,
                          'high_range': high_val,
-                         'generated': True})
+                         'generated': 1})
 
         # montar DF resultante
         weekly_df = pd.DataFrame(rows)
